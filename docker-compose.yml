@@ -1,0 +1,17 @@
+# Local smoke-test of the app + chaos endpoints before deploying to AWS.
+#   docker compose up --build
+#   curl localhost:8000/health
+#   curl -X POST "localhost:8000/chaos/errors?rate=0.6"
+#   python chaos/chaos.py --url http://localhost:8000 errors --duration 60
+services:
+  app:
+    build: ./app
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8000/health').status==200 else 1)"]
+      interval: 15s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
