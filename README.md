@@ -16,10 +16,7 @@ It implements all four lab objectives on **AWS** with a **FastAPI** web tier:
 
 ![TechStream self-healing architecture](docs/architecture.png)
 
-> Diagram source: [docs/architecture.drawio](docs/architecture.drawio) — built with
-> the AWS architecture icon set. Open it in [draw.io](https://app.diagrams.net) or
-> the VS Code *Draw.io Integration* extension to edit; re-export to
-> `docs/architecture.svg` to refresh the image above.
+
 
 **The self-healing loop:** the chaos script injects faults → the ALB/EC2 emit
 metrics to CloudWatch → the alarm trips at >5% error rate → EventBridge invokes
