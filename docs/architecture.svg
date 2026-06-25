@@ -1,0 +1,142 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1360 760" font-family="'Segoe UI',Arial,sans-serif">
+  <defs>
+    <marker id="aDark" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L8,3 L0,6 Z" fill="#232F3E"/></marker>
+    <marker id="aGray" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L8,3 L0,6 Z" fill="#8A94A6"/></marker>
+    <marker id="aGreen" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L8,3 L0,6 Z" fill="#2E8B57"/></marker>
+    <marker id="aRed" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L8,3 L0,6 Z" fill="#C7283F"/></marker>
+    <marker id="aBlue" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L8,3 L0,6 Z" fill="#1E6FBF"/></marker>
+  </defs>
+
+  <rect width="1360" height="760" fill="#FFFFFF"/>
+  <text x="680" y="40" text-anchor="middle" font-size="22" font-weight="700" fill="#232F3E">TechStream — Self-Healing Architecture (AWS)</text>
+
+  <!-- Containers -->
+  <rect x="230" y="80" width="1095" height="600" rx="12" fill="#F7F9FB" stroke="#232F3E" stroke-width="1.5"/>
+  <text x="248" y="104" font-size="13" font-weight="700" fill="#232F3E">AWS Cloud · eu-west-1</text>
+
+  <rect x="275" y="230" width="470" height="335" rx="10" fill="#EAF7F1" stroke="#248814" stroke-width="1.5"/>
+  <text x="291" y="252" font-size="13" font-weight="700" fill="#248814">VPC (default)</text>
+
+  <rect x="540" y="300" width="180" height="250" rx="10" fill="none" stroke="#ED7100" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="556" y="322" font-size="12" font-style="italic" fill="#9C4C00">Auto Scaling Group</text>
+
+  <!-- Edges (drawn before boxes so arrowheads sit on box edges) -->
+  <!-- control flow: solid dark -->
+  <polyline points="190,330 250,330 250,408 300,408" fill="none" stroke="#232F3E" stroke-width="1.6" marker-end="url(#aDark)"/>
+  <text x="205" y="322" font-size="11" fill="#232F3E">HTTP</text>
+
+  <polyline points="430,392 495,392 495,360 560,360" fill="none" stroke="#232F3E" stroke-width="1.6" marker-end="url(#aDark)"/>
+  <text x="500" y="352" font-size="11" fill="#232F3E">forward</text>
+  <polyline points="430,420 495,420 495,500 560,500" fill="none" stroke="#232F3E" stroke-width="1.6" marker-end="url(#aDark)"/>
+
+  <line x1="905" y1="360" x2="905" y2="418" stroke="#232F3E" stroke-width="1.6" marker-end="url(#aDark)"/>
+  <text x="912" y="394" font-size="11" font-weight="600" fill="#232F3E">state = ALARM</text>
+
+  <polyline points="1010,452 1042,452 1042,502 1070,502" fill="none" stroke="#232F3E" stroke-width="1.6" marker-end="url(#aDark)"/>
+  <text x="1012" y="472" font-size="11" fill="#232F3E">trigger</text>
+
+  <line x1="1175" y1="470" x2="1175" y2="362" stroke="#232F3E" stroke-width="1.6" marker-end="url(#aDark)"/>
+  <text x="1182" y="430" font-size="11" fill="#232F3E">SendCommand</text>
+
+  <!-- fault injection: red -->
+  <polyline points="190,428 268,428 268,422 300,422" fill="none" stroke="#C7283F" stroke-width="1.6" marker-end="url(#aRed)"/>
+  <text x="196" y="448" font-size="11" font-weight="600" fill="#C7283F">inject faults</text>
+
+  <!-- telemetry: dashed gray -->
+  <line x1="432" y1="384" x2="798" y2="216" stroke="#8A94A6" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#aGray)"/>
+  <text x="556" y="286" font-size="11" fill="#5A6B86">golden signals</text>
+  <line x1="432" y1="404" x2="798" y2="322" stroke="#8A94A6" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#aGray)"/>
+  <text x="560" y="372" font-size="11" fill="#5A6B86">5XX / requests</text>
+  <line x1="722" y1="430" x2="798" y2="242" stroke="#8A94A6" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#aGray)"/>
+  <text x="726" y="356" font-size="11" fill="#5A6B86">CPU / mem</text>
+  <line x1="1068" y1="220" x2="748" y2="288" stroke="#8A94A6" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#aGray)"/>
+  <text x="836" y="244" font-size="11" fill="#5A6B86">observe &amp; correlate</text>
+
+  <!-- remediation: green -->
+  <polyline points="1070,338 880,338 880,408 722,408" fill="none" stroke="#2E8B57" stroke-width="2" marker-end="url(#aGreen)"/>
+  <text x="812" y="330" font-size="11" font-weight="700" fill="#2E8B57">restart + clear chaos</text>
+
+  <!-- CI/CD: blue -->
+  <polyline points="190,628 232,628 232,628 270,628" fill="none" stroke="#1E6FBF" stroke-width="1.6" marker-end="url(#aBlue)"/>
+  <text x="196" y="620" font-size="11" fill="#1E6FBF">tf state</text>
+  <polyline points="120,600 120,430 228,430" fill="none" stroke="#1E6FBF" stroke-width="1.6" marker-end="url(#aBlue)"/>
+  <text x="126" y="486" font-size="11" font-weight="600" fill="#1E6FBF">OIDC → apply</text>
+
+  <!-- External actors -->
+  <g>
+    <rect x="30" y="302" width="160" height="56" rx="8" fill="#5A6B86"/>
+    <text x="110" y="335" text-anchor="middle" font-size="13" font-weight="600" fill="#fff">Users / Traffic</text>
+  </g>
+  <g>
+    <rect x="30" y="400" width="160" height="56" rx="8" fill="#C7283F"/>
+    <text x="110" y="423" text-anchor="middle" font-size="12" font-weight="600" fill="#fff">Chaos Script</text>
+    <text x="110" y="441" text-anchor="middle" font-size="11" fill="#fff">(500s / CPU spike)</text>
+  </g>
+  <g>
+    <rect x="30" y="600" width="160" height="58" rx="8" fill="#24292E"/>
+    <text x="110" y="624" text-anchor="middle" font-size="12" font-weight="600" fill="#fff">GitHub Actions</text>
+    <text x="110" y="642" text-anchor="middle" font-size="11" fill="#fff">CI / gated Deploy</text>
+  </g>
+
+  <!-- AWS services (category colors) -->
+  <g>
+    <rect x="300" y="376" width="130" height="64" rx="8" fill="#8C4FFF"/>
+    <text x="365" y="402" text-anchor="middle" font-size="12" font-weight="600" fill="#fff">Application</text>
+    <text x="365" y="420" text-anchor="middle" font-size="12" font-weight="600" fill="#fff">Load Balancer</text>
+  </g>
+  <g>
+    <rect x="560" y="332" width="140" height="56" rx="8" fill="#ED7100"/>
+    <text x="630" y="356" text-anchor="middle" font-size="12" font-weight="600" fill="#fff">EC2 + FastAPI</text>
+    <text x="630" y="374" text-anchor="middle" font-size="10" fill="#fff">systemd: techstream</text>
+  </g>
+  <g>
+    <rect x="560" y="472" width="140" height="56" rx="8" fill="#ED7100"/>
+    <text x="630" y="496" text-anchor="middle" font-size="12" font-weight="600" fill="#fff">EC2 + FastAPI</text>
+    <text x="630" y="514" text-anchor="middle" font-size="10" fill="#fff">systemd: techstream</text>
+  </g>
+  <g>
+    <rect x="800" y="182" width="210" height="64" rx="8" fill="#E7157B"/>
+    <text x="905" y="208" text-anchor="middle" font-size="12" font-weight="600" fill="#fff">CloudWatch</text>
+    <text x="905" y="226" text-anchor="middle" font-size="11" fill="#fff">Golden Signals Dashboard</text>
+  </g>
+  <g>
+    <rect x="800" y="302" width="210" height="58" rx="8" fill="#E7157B"/>
+    <text x="905" y="327" text-anchor="middle" font-size="12" font-weight="600" fill="#fff">CloudWatch Alarm</text>
+    <text x="905" y="345" text-anchor="middle" font-size="11" fill="#fff">error rate &gt; 5%</text>
+  </g>
+  <g>
+    <rect x="800" y="422" width="210" height="58" rx="8" fill="#8C4FFF"/>
+    <text x="905" y="447" text-anchor="middle" font-size="12" font-weight="600" fill="#fff">EventBridge Rule</text>
+    <text x="905" y="465" text-anchor="middle" font-size="10" fill="#fff">alarm state change</text>
+  </g>
+  <g>
+    <rect x="1070" y="182" width="210" height="64" rx="8" fill="#E7157B"/>
+    <text x="1175" y="208" text-anchor="middle" font-size="12" font-weight="600" fill="#fff">DevOps Guru</text>
+    <text x="1175" y="226" text-anchor="middle" font-size="11" fill="#fff">AI root-cause insights</text>
+  </g>
+  <g>
+    <rect x="1070" y="302" width="210" height="58" rx="8" fill="#E7157B"/>
+    <text x="1175" y="327" text-anchor="middle" font-size="12" font-weight="600" fill="#fff">SSM Run Command</text>
+    <text x="1175" y="345" text-anchor="middle" font-size="10" fill="#fff">systemctl restart</text>
+  </g>
+  <g>
+    <rect x="1070" y="474" width="210" height="56" rx="8" fill="#ED7100"/>
+    <text x="1175" y="498" text-anchor="middle" font-size="12" font-weight="600" fill="#fff">Lambda</text>
+    <text x="1175" y="516" text-anchor="middle" font-size="10" fill="#fff">remediation handler</text>
+  </g>
+  <g>
+    <rect x="270" y="600" width="210" height="56" rx="8" fill="#7AA116"/>
+    <text x="375" y="624" text-anchor="middle" font-size="12" font-weight="600" fill="#fff">S3</text>
+    <text x="375" y="642" text-anchor="middle" font-size="10" fill="#fff">Terraform state + lock</text>
+  </g>
+
+  <!-- Legend -->
+  <g font-size="11" fill="#5A6B86">
+    <text x="248" y="704" font-weight="700" fill="#232F3E">Legend:</text>
+    <line x1="312" y1="700" x2="348" y2="700" stroke="#232F3E" stroke-width="1.6"/><text x="354" y="704">control flow</text>
+    <line x1="440" y1="700" x2="476" y2="700" stroke="#8A94A6" stroke-width="1.4" stroke-dasharray="5 4"/><text x="482" y="704">telemetry</text>
+    <line x1="552" y1="700" x2="588" y2="700" stroke="#2E8B57" stroke-width="2"/><text x="594" y="704">remediation</text>
+    <line x1="676" y1="700" x2="712" y2="700" stroke="#C7283F" stroke-width="1.6"/><text x="718" y="704">fault injection</text>
+    <line x1="812" y1="700" x2="848" y2="700" stroke="#1E6FBF" stroke-width="1.6"/><text x="854" y="704">CI/CD</text>
+  </g>
+</svg>

@@ -14,25 +14,18 @@ It implements all four lab objectives on **AWS** with a **FastAPI** web tier:
 
 ## Architecture
 
-```
-        Chaos script (HTTP 500s / CPU spike)
-                     │  HTTP
-                     ▼
-   ALB  ───►  Auto Scaling Group (EC2 + FastAPI via systemd)
-   (latency, traffic, errors)        (CPU / saturation)
-                     │ metrics
-                     ▼
-        CloudWatch Dashboard + Alarm  (error rate > 5%)
-                     │ ALARM state change
-                     ▼
-              EventBridge Rule
-                     │
-                     ▼
-        Lambda ──► SSM Run Command:  systemctl restart techstream
-                     (heals every tagged instance, no engineer paged)
+![TechStream self-healing architecture](docs/architecture.svg)
 
-   Amazon DevOps Guru watches the tagged stack → AI root-cause insight
-```
+> Diagram source: [docs/architecture.drawio](docs/architecture.drawio) — built with
+> the AWS architecture icon set. Open it in [draw.io](https://app.diagrams.net) or
+> the VS Code *Draw.io Integration* extension to edit; re-export to
+> `docs/architecture.svg` to refresh the image above.
+
+**The self-healing loop:** the chaos script injects faults → the ALB/EC2 emit
+metrics to CloudWatch → the alarm trips at >5% error rate → EventBridge invokes
+the Lambda → SSM restarts the `techstream` service on every instance → the alarm
+clears, with no engineer paged. DevOps Guru watches the tagged stack in parallel
+and produces an AI root-cause insight.
 
 **Why the Golden Signals come from the ALB + EC2:** the Application Load
 Balancer natively emits latency (`TargetResponseTime`), traffic
