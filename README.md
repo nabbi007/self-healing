@@ -14,7 +14,7 @@ It implements all four lab objectives on **AWS** with a **FastAPI** web tier:
 
 ## Architecture
 
-![TechStream self-healing architecture](docs/architecture.svg)
+![TechStream self-healing architecture](docs/architecture.png)
 
 > Diagram source: [docs/architecture.drawio](docs/architecture.drawio) — built with
 > the AWS architecture icon set. Open it in [draw.io](https://app.diagrams.net) or
