@@ -1,0 +1,79 @@
+name: Deploy
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # allows manual runs from the Actions tab
+
+# Required for GitHub's OIDC token to be issued to the job.
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  TF_DIR: infrastructure/terraform
+  AWS_REGION: ${{ vars.AWS_REGION }}
+
+jobs:
+  plan:
+    name: Terraform plan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.14.1"
+
+      - name: Terraform init
+        run: terraform -chdir=$TF_DIR init -backend-config="bucket=${{ vars.TF_STATE_BUCKET }}"
+
+      - name: Terraform plan
+        run: terraform -chdir=$TF_DIR plan -input=false -out=tfplan
+
+      - name: Upload plan artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tfplan
+          path: ${{ env.TF_DIR }}/tfplan
+          retention-days: 1
+
+  apply:
+    name: Terraform apply (manual approval)
+    needs: plan
+    runs-on: ubuntu-latest
+    # This environment must have "Required reviewers" enabled in repo settings.
+    # GitHub pauses the run here until a reviewer approves.
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.14.1"
+
+      - name: Terraform init
+        run: terraform -chdir=$TF_DIR init -backend-config="bucket=${{ vars.TF_STATE_BUCKET }}"
+
+      - name: Download plan artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: tfplan
+          path: ${{ env.TF_DIR }}
+
+      - name: Terraform apply
+        run: terraform -chdir=$TF_DIR apply -input=false tfplan
+
+      - name: Show outputs
+        run: terraform -chdir=$TF_DIR output
