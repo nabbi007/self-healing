@@ -1,0 +1,6 @@
+# Copy to backend.hcl and set your real bucket name, then run:
+#   terraform init -backend-config=backend.hcl -migrate-state
+#
+# backend.hcl is gitignored (it just names your bucket; not a secret, but
+# environment-specific). The rest of the backend settings live in backend.tf.
+bucket = "your-state-bucket-name"

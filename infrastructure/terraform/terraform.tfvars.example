@@ -1,0 +1,17 @@
+# Copy to terraform.tfvars and adjust as needed.
+
+aws_region   = "eu-west-1"
+project_name = "techstream"
+
+# Lock the ALB to your own IP for a real deployment, e.g. "203.0.113.4/32"
+allowed_ingress_cidr = "0.0.0.0/0"
+
+instance_type        = "t3.micro"
+asg_min_size         = 1
+asg_max_size         = 3
+asg_desired_capacity = 2
+
+error_rate_threshold_percent = 5
+
+# DevOps Guru incurs cost — set to false to skip it.
+enable_devops_guru = true

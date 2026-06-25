@@ -1,0 +1,64 @@
+#!/bin/bash
+set -euxo pipefail
+
+# ---------------------------------------------------------------------
+# TechStream web server bootstrap (Amazon Linux 2023)
+# Installs the FastAPI app and runs it as a systemd service named
+# "techstream" — the same service the self-healing Lambda restarts.
+# ---------------------------------------------------------------------
+
+dnf update -y
+dnf install -y python3.11 python3.11-pip
+
+# Application code (rendered from app/main.py by Terraform)
+install -d -m 0755 /opt/techstream
+cat > /opt/techstream/main.py <<'APP_EOF'
+${app_code}
+APP_EOF
+
+# Isolated virtualenv so we never touch the system Python
+python3.11 -m venv /opt/techstream/venv
+/opt/techstream/venv/bin/pip install --no-cache-dir \
+  fastapi==0.111.0 "uvicorn[standard]==0.30.1" prometheus-client==0.20.0 psutil==5.9.8
+
+# Dedicated unprivileged service account
+id techstream &>/dev/null || useradd --system --no-create-home --shell /usr/sbin/nologin techstream
+chown -R techstream:techstream /opt/techstream
+
+# systemd unit — "systemctl restart techstream" is our remediation action
+cat > /etc/systemd/system/techstream.service <<'UNIT_EOF'
+[Unit]
+Description=TechStream FastAPI web server
+After=network.target
+
+[Service]
+Type=simple
+User=techstream
+WorkingDirectory=/opt/techstream
+ExecStart=/opt/techstream/venv/bin/uvicorn main:app --host 0.0.0.0 --port 8000
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target
+UNIT_EOF
+
+systemctl daemon-reload
+systemctl enable --now techstream.service
+
+# CloudWatch agent for instance memory/disk saturation signals
+dnf install -y amazon-cloudwatch-agent
+cat > /opt/aws/amazon-cloudwatch-agent/etc/cw-config.json <<'CW_EOF'
+{
+  "metrics": {
+    "namespace": "TechStream/EC2",
+    "append_dimensions": { "AutoScalingGroupName": "$${aws:AutoScalingGroupName}" },
+    "metrics_collected": {
+      "mem": { "measurement": ["mem_used_percent"] },
+      "disk": { "measurement": ["used_percent"], "resources": ["/"] }
+    }
+  }
+}
+CW_EOF
+/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl \
+  -a fetch-config -m ec2 -s -c file:/opt/aws/amazon-cloudwatch-agent/etc/cw-config.json
