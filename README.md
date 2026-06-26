@@ -16,7 +16,7 @@ It implements all four lab objectives on **AWS** with a **FastAPI** web tier:
 
 ![TechStream self-healing architecture](docs/architecture.png)
 
-
+> Editable source: [docs/architecture.drawio](docs/architecture.drawio) (built with the AWS architecture icon set).
 
 **The self-healing loop:** the chaos script injects faults → the ALB/EC2 emit
 metrics to CloudWatch → the alarm trips at >5% error rate → EventBridge invokes
@@ -185,6 +185,81 @@ then:
      --status-filter 'Closed={Type=REACTIVE},Ongoing={Type=REACTIVE}'
    aws devops-guru describe-insight --id <INSIGHT_ID>
    ```
+
+---
+
+## Demonstration & Evidence
+
+The self-healing loop was exercised end to end against the live stack. The chaos
+script drove the error rate to **39%**, the alarm tripped, and the system
+recovered **on its own in ~4 minutes** — no engineer paged.
+
+**Measured incident timeline (one chaos run):**
+
+| Time (UTC) | Alarm state | What happened |
+|------------|-------------|---------------|
+| `11:18:52` | `OK` | Healthy baseline |
+| `11:19:13` | `ALARM` | Error rate hit 39% (> 5% threshold) |
+| `11:19:10` | — | EventBridge invoked the Lambda; SSM restarted both instances |
+| `11:23:23` | `OK` | Service recovered — **self-heal complete** |
+
+---
+
+### 1. Golden Signals monitoring
+
+The CloudWatch dashboard during the incident — latency, traffic, errors and
+saturation on one screen. The **Errors** widget shows the 5XX rate spiking past
+the red **5% alarm threshold**, and the **Self-healing alarm** widget is red
+(in `ALARM`). Two hosts report healthy throughout.
+
+![Golden Signals dashboard](docs/screenshots/01-golden-signals-dashboard.png)
+
+### 2. The error-rate alarm firing
+
+The `techstream-high-error-rate` alarm in the **In alarm** state once the 5XX
+error rate crossed 5%.
+
+![Error-rate alarm in ALARM](docs/screenshots/02-alarm-in-alarm.png)
+
+### 3. Automated remediation (alarm → EventBridge → Lambda → SSM)
+
+The remediation Lambda fired exactly once and succeeded (100% success rate),
+triggered automatically by the alarm.
+
+![Lambda invocation](docs/screenshots/03-lambda-invocation.png)
+
+The Lambda log and the SSM Run Command confirm the restart was dispatched to
+**both** instances automatically:
+
+```text
+Remediation triggered. detail-type: "CloudWatch Alarm State Change"
+  reason: error rate 39.07% was greater than the threshold (5.0)
+Restarting techstream on instances: ['i-0dd304d8ccfc21f5c', 'i-0361c46856d524f59']
+SSM command 0d03e746-... dispatched to 2 instance(s).
+
+SSM Run Command  →  Status: Success
+  Targets: i-0361c46856d524f59, i-0dd304d8ccfc21f5c
+  Comment: "Self-healing restart triggered by techstream-high-error-rate"
+```
+
+### 4. AI analysis — DevOps Guru
+
+DevOps Guru analyzing the stack, scoped by the `Devops-guru-techstream` tag —
+the ALB, load balancer and Lambda are all under continuous AI observation for
+anomaly correlation and root-cause insights.
+
+![DevOps Guru analyzed resources](docs/screenshots/04-devopsguru-resources.png)
+
+### Supporting infrastructure
+
+The Auto Scaling Group running two healthy FastAPI instances:
+
+![EC2 instances](docs/screenshots/05-ec2-instances.png)
+
+The deployed application (FastAPI Swagger UI) exposing the API and chaos
+endpoints:
+
+![FastAPI Swagger UI](docs/screenshots/06-app-swagger.png)
 
 ---
 
